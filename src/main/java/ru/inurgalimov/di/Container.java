@@ -1,7 +1,7 @@
 package ru.inurgalimov.di;
 
-import ru.inurgalimov.di.annotations.Inject;
-import ru.inurgalimov.di.exceptions.*;
+import ru.inurgalimov.di.annotation.Inject;
+import ru.inurgalimov.di.exception.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

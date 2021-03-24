@@ -1,4 +1,4 @@
-package ru.inurgalimov.di.annotations;
+package ru.inurgalimov.di.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

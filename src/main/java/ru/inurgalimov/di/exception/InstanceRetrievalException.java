@@ -1,4 +1,4 @@
-package ru.inurgalimov.di.exceptions;
+package ru.inurgalimov.di.exception;
 
 public class InstanceRetrievalException extends RuntimeException {
 
