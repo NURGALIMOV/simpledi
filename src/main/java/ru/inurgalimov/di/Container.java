@@ -16,7 +16,7 @@ public class Container {
     private final Set<Class<?>> definitions = new HashSet<>();
 
     public void register(Class<?>... definitions) {
-        String badDefinitions = Arrays.stream(definitions)
+        final String badDefinitions = Arrays.stream(definitions)
                 .filter(o -> o.getDeclaredConstructors().length != 1)
                 .map(Class::getName)
                 .collect(Collectors.joining(", "));
@@ -30,7 +30,6 @@ public class Container {
         if (values.containsKey(name)) {
             throw new AmbiguousValueNameException(String.format("%s with value %s", name, value.toString()));
         }
-
         values.put(name, value);
     }
 
@@ -38,7 +37,7 @@ public class Container {
         if (definitions.isEmpty()) {
             return;
         }
-        Set<Class<?>> tempDefinitions = new HashSet<>(definitions);
+        final Set<Class<?>> tempDefinitions = new HashSet<>(definitions);
         while (!tempDefinitions.isEmpty()) {
             final Map<? extends Class<?>, Object> intermediate = getClassObjectMap(tempDefinitions);
             if (intermediate.isEmpty()) {
