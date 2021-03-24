@@ -7,14 +7,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Container {
-    private final Map<String, Object> values = new ConcurrentHashMap<>();
-    private final Map<Class<?>, Object> objects = new ConcurrentHashMap<>();
-    private final Set<Class<?>> definitions = Collections.synchronizedSet(new HashSet<>());
+    private final Map<String, Object> values = new HashMap<>();
+    private final Map<Class<?>, Object> objects = new HashMap<>();
+    private final Set<Class<?>> definitions = new HashSet<>();
 
     public void register(Class<?>... definitions) {
         String badDefinitions = Arrays.stream(definitions)
