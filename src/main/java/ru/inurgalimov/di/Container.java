@@ -6,6 +6,7 @@ import ru.inurgalimov.di.exception.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -64,41 +65,44 @@ public class Container {
 
     private Map<? extends Class<?>, Object> getClassObjectMap(Set<Class<?>> tempDefinitions) {
         return tempDefinitions.stream()
-                .map(clazz -> {
-                    if (objects.containsKey(clazz)) {
-                        throw new DIException(String.format("More one implementations by class %s", clazz));
-                    }
-                    return clazz.getDeclaredConstructors()[0];
-                })
-                .filter(constructor -> objects.isEmpty() ?
-                        ((constructor.getParameterCount() == 0) || allParameterInValues(constructor)) :
-                        allParameterInValues(constructor))
-                .map(constructor -> {
-                    try {
-                        boolean isPublic = Modifier.isPublic(constructor.getModifiers());
-                        if (!isPublic) {
-                            constructor.setAccessible(true);
-                        }
-                        Object result = constructor.newInstance(Arrays.stream(constructor.getParameters())
-                                .map(p -> Optional.ofNullable(objects.get(p.getType()))
-                                        .or(() -> Optional.ofNullable(p.getAnnotation(Inject.class))
-                                                .map(Inject::value)
-                                                .map(values::get))
-                                        .orElseThrow(() -> new UnmetDependenciesException(p.getName()))
-                                )
-                                .toArray());
-                        if (!isPublic) {
-                            constructor.setAccessible(false);
-                        }
-                        return result;
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                        throw new ObjectInstantiationException(e);
-                    }
-                })
+                .map(this::getСlassСonstructor)
+                .filter(constructor -> (constructor.getParameterCount() == 0) || allParameterInValues(constructor))
+                .map(this::createObject)
                 .collect(Collectors.toMap(Object::getClass, Function.identity()));
     }
 
+    private Object createObject(Constructor<?> constructor) {
+        try {
+            boolean isPublic = Modifier.isPublic(constructor.getModifiers());
+            if (!isPublic) {
+                constructor.setAccessible(true);
+            }
+            Object result =
+                    constructor.newInstance(Arrays.stream(constructor.getParameters()).map(this::getObjectByParameter).toArray());
+            if (!isPublic) {
+                constructor.setAccessible(false);
+            }
+            return result;
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+            throw new ObjectInstantiationException(e);
+        }
+    }
+
+    private Object getObjectByParameter(Parameter parameter) {
+        return Optional.ofNullable(objects.get(parameter.getType()))
+                .or(() -> Optional.ofNullable(parameter.getAnnotation(Inject.class))
+                        .map(Inject::value)
+                        .map(values::get))
+                .orElseThrow(() -> new UnmetDependenciesException(parameter.getName()));
+    }
+
+    private Constructor<?> getСlassСonstructor(Class<?> clazz) {
+        if (objects.containsKey(clazz)) {
+            throw new DIException(String.format("More one implementations by class %s", clazz));
+        }
+        return clazz.getDeclaredConstructors()[0];
+    }
 
     private boolean allParameterInValues(Constructor<?> constructor) {
         return Arrays.asList(constructor.getParameters())
