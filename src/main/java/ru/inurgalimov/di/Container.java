@@ -39,7 +39,7 @@ public class Container {
         if (definitions.isEmpty()) {
             return;
         }
-        HashSet<Class<?>> tempDefinitions = new HashSet<>(definitions);
+        Set<Class<?>> tempDefinitions = new HashSet<>(definitions);
         while (!tempDefinitions.isEmpty()) {
             final Map<? extends Class<?>, Object> intermediate = getClassObjectMap(tempDefinitions);
             if (intermediate.isEmpty()) {
@@ -64,7 +64,7 @@ public class Container {
                         new InstanceRetrievalException(String.format("Failed to get an instance of the class %s", clazz)));
     }
 
-    private Map<? extends Class<?>, Object> getClassObjectMap(HashSet<Class<?>> tempDefinitions) {
+    private Map<? extends Class<?>, Object> getClassObjectMap(Set<Class<?>> tempDefinitions) {
         return tempDefinitions.stream()
                 .map(clazz -> {
                     if (objects.containsKey(clazz)) {
