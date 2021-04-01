@@ -73,13 +73,13 @@ public class Container {
 
     private Object createObject(Constructor<?> constructor) {
         try {
-            boolean isPublic = Modifier.isPublic(constructor.getModifiers());
+            final boolean isPublic = Modifier.isPublic(constructor.getModifiers());
             if (!isPublic) {
                 constructor.setAccessible(true);
             }
-            Object result =
-                    constructor.newInstance(Arrays.stream(constructor.getParameters()).map(this::getObjectByParameter).toArray());
-            return result;
+            return constructor.newInstance(Arrays.stream(constructor.getParameters())
+                    .map(this::getObjectByParameter)
+                    .toArray());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             throw new ObjectInstantiationException(e);
