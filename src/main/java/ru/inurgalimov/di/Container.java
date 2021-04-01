@@ -79,9 +79,6 @@ public class Container {
             }
             Object result =
                     constructor.newInstance(Arrays.stream(constructor.getParameters()).map(this::getObjectByParameter).toArray());
-            if (!isPublic) {
-                constructor.setAccessible(false);
-            }
             return result;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
